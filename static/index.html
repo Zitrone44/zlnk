@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        
+        <link rel="stylesheet" href="/assets/bootstrap.min.css"/>
+        <script src="/assets/jquery.min.js"></script>
+        <script src="/assets/bootstrap.min.js"></script>
+        <script src="/zlnk.js"></script>
+
+        <title>ZLNK</title>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Addresse Kürzen</h1>
+            <form id="form">
+                <div class="form-group">
+                    <input id="longURL" type="url" placeholder="Lange Addresse" class="form-control"/>
+                    <div id="longURLFeedback" class="invalid-feedback"></div>
+                </div>
+                <br/>
+                <input id="submitButton" type="submit" class="btn btn-primary" value="Kürzen"/>
+            </form>
+            <div id="resultContainer" class="invisible">
+                <hr>
+                <div id="result"></div>
+            </div>
+        </div>
+    </body>
+</html>
