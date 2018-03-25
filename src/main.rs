@@ -33,7 +33,6 @@ static_file!("/zlnk.js", "../static/zlnk.js", ContentType::JavaScript, js);
 static_file!("/assets/jquery.min.js", "../assets/jquery.min.js", ContentType::JavaScript, jquery);
 static_file!("/assets/bootstrap.min.css", "../assets/bootstrap.min.css", ContentType::CSS, bootstrap_css);
 static_file!("/assets/bootstrap.min.js", "../assets/bootstrap.min.js", ContentType::JavaScript, bootstrap_js);
-static_file!("/assets/link-intact.svg", "../assets/link-intact.svg", ContentType::SVG, link_icon);
 
 #[post("/shorten", data="<long_url>")]
 fn shorten(long_url: String, env: State<Env>, db: State<DB>) -> Result<String, Failure> {
@@ -76,7 +75,7 @@ fn main() {
     let env = env_loader::init();
     let db = DB::open_default(&env.database_path).unwrap();
     rocket::ignite()
-        .mount("/", routes![index, js, jquery, bootstrap_css, bootstrap_js, link_icon, shorten, longen])
+        .mount("/", routes![index, js, jquery, bootstrap_css, bootstrap_js, shorten, longen])
         .catch(errors![not_found, bad_request]).manage(env).manage(db)
         .launch();
 }
