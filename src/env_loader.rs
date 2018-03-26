@@ -7,6 +7,7 @@ pub struct Env {
     pub database_path: String,
     pub url_regex: Regex,
     pub short_length: usize,
+    pub short_alphabet: String,
     pub bad_request_message: String
 }
 
@@ -18,6 +19,7 @@ pub fn init() -> Env {
         database_path: env::var("DATABASE_PATH").unwrap_or("./db".to_string()),
         url_regex: Regex::new(&env::var("URL_REGEX").unwrap_or(URL_REGEX.to_string())).unwrap(),
         short_length: usize::from_str(&env::var("SHORT_LENGTH").unwrap_or("5".to_string())).unwrap(),
+        short_alphabet: env::var("SHORT_ALPHABET").unwrap_or("hex".to_string()),
         bad_request_message: env::var("BAD_REQUEST_MESSAGE").unwrap_or("Ungültige URL".to_string())
     }
 }
