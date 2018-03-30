@@ -1,6 +1,6 @@
 [package]
 name = "zlnk"
-version = "0.3.0"
+version = "0.3.1"
 authors = ["Jonas Kuche <Jonas.kuche@gmail.com>"]
 
 [dependencies]
