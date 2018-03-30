@@ -4,7 +4,9 @@ extern crate rocket;
 extern crate dotenv;
 extern crate regex;
 extern crate rand;
-extern crate rocksdb;
+extern crate r2d2;
+extern crate r2d2_redis;
+extern crate redis;
 
 mod env_loader;
 mod shortener;
@@ -16,7 +18,8 @@ use rocket::response::Content;
 use rocket::response::Redirect;
 use rocket::response::Failure;
 use rocket::State;
-use rocksdb::DB;
+use r2d2::Pool;
+use r2d2_redis::RedisConnectionManager;
 use env_loader::Env;
 use shortener::{short, long};
 
@@ -35,8 +38,9 @@ static_file!("/assets/bootstrap.min.css", "../assets/bootstrap.min.css", Content
 static_file!("/assets/bootstrap.min.js", "../assets/bootstrap.min.js", ContentType::JavaScript, bootstrap_js);
 
 #[post("/shorten", data="<long_url>")]
-fn shorten(long_url: String, env: State<Env>, db: State<DB>) -> Result<String, Failure> {
-    let short_url = short(long_url, env.inner(), db.inner());
+fn shorten(long_url: String, env: State<Env>, pool: State<Pool<RedisConnectionManager>>) -> Result<String, Failure> {
+    let connection = &pool.get().unwrap();
+    let short_url = short(long_url, env.inner(), connection);
     match short_url {
         Some(short_url) => {
             Ok(short_url)
@@ -48,8 +52,9 @@ fn shorten(long_url: String, env: State<Env>, db: State<DB>) -> Result<String, F
 }
 
 #[get("/<short>")]
-fn longen(short: String, db: State<DB>) -> Option<Redirect> {
-    let long = long(short, db.inner());
+fn longen(short: String, pool: State<Pool<RedisConnectionManager>>) -> Option<Redirect> {
+    let connection = &pool.get().unwrap();
+    let long = long(short, connection);
     match long {
         Some(long) => {
             Some(Redirect::to(&long))
@@ -73,9 +78,12 @@ fn bad_request(request: &Request) -> String {
 
 fn main() {
     let env = env_loader::init();
-    let db = DB::open_default(&env.database_path).unwrap();
+    let manager = RedisConnectionManager::new(env.redis_url.as_str()).unwrap();
+    let pool = r2d2::Pool::builder()
+        .build(manager)
+        .unwrap();
     rocket::ignite()
         .mount("/", routes![index, js, jquery, bootstrap_css, bootstrap_js, shorten, longen])
-        .catch(errors![not_found, bad_request]).manage(env).manage(db)
+        .catch(errors![not_found, bad_request]).manage(env).manage(pool)
         .launch();
 }

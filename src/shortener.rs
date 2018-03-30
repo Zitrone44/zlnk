@@ -1,6 +1,8 @@
 use env_loader::Env;
 use rand::{thread_rng, Rng};
-use rocksdb::DB;
+use r2d2;
+use r2d2_redis;
+use redis::Commands;
 
 pub fn random(length: usize, alphabet_name: String) -> String {
     let mut rng = thread_rng();
@@ -25,18 +27,18 @@ pub fn random(length: usize, alphabet_name: String) -> String {
     result.join("")
 }
 
-pub fn short(long_url: String, env: &Env, database: &DB) -> Option<String> {
+pub fn short(long_url: String, env: &Env, connection: &r2d2::PooledConnection<r2d2_redis::RedisConnectionManager>) -> Option<String> {
     let valid = env.url_regex.is_match(&long_url);
     if valid {
-        let existing = database.get(long_url.as_bytes()).unwrap();
+        let existing = connection.get(&long_url);
         match existing {
-            Some(existing_short) => {
-                Some(String::from_utf8(existing_short.to_vec()).unwrap())
+            Ok(existing_short) => {
+                Some(existing_short)
             }
-            None => {
+            Err(_err) => {
                 let random_value = random(env.short_length, env.short_alphabet.to_owned());
-                database.put(random_value.as_bytes(), long_url.as_bytes()).unwrap();
-                database.put(long_url.as_bytes(), random_value.as_bytes()).unwrap();
+                let _: () = connection.set(&random_value, &long_url).unwrap();
+                let _: () = connection.set(&long_url, &random_value).unwrap();
                 Some(random_value)
             }
         }
@@ -45,13 +47,13 @@ pub fn short(long_url: String, env: &Env, database: &DB) -> Option<String> {
     }
 }
 
-pub fn long(short_url: String, database: &DB) -> Option<String> {
-    let long = database.get(short_url.as_bytes()).unwrap();
+pub fn long(short_url: String, connection: &r2d2::PooledConnection<r2d2_redis::RedisConnectionManager>) -> Option<String> {
+    let long = connection.get(short_url);
     match long {
-        Some(bytes) => {
-            Some(String::from_utf8(bytes.to_vec()).unwrap())
+        Ok(long) => {
+            Some(long)
         }
-        None => {
+        Err(_err) => {
             None
         }
     }
