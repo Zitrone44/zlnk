@@ -11,7 +11,7 @@ pub struct Env {
     pub bad_request_message: String
 }
 
-const URL_REGEX: &'static str = "^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?";
+const URL_REGEX: &'static str = r"^(https?://)?([\da-z\.-]+)\.([a-z\.]{2,6})([/\w \.-]*)*/?$";
 
 pub fn init() -> Env {
     dotenv().ok();
