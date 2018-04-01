@@ -10,7 +10,8 @@ extern crate redis;
 
 mod env_loader;
 mod shortener;
-mod test;
+#[cfg(test)]
+mod tests;
 
 use rocket::http::ContentType;
 use rocket::http::Status;
