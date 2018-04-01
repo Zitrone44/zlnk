@@ -7,9 +7,16 @@ extern crate rand;
 extern crate r2d2;
 extern crate r2d2_redis;
 extern crate redis;
+extern crate url;
+extern crate woothee;
+extern crate maxminddb;
+#[macro_use]
+extern crate serde_json;
 
 mod env_loader;
 mod shortener;
+mod geo_locate_ip;
+mod stats;
 #[cfg(test)]
 mod tests;
 
@@ -23,6 +30,8 @@ use rocket::State;
 use r2d2::Pool;
 use r2d2_redis::RedisConnectionManager;
 use env_loader::Env;
+use geo_locate_ip::GeoLocateIP;
+use stats::Stats;
 use shortener::{short, long};
 
 macro_rules! static_file {
@@ -54,14 +63,28 @@ fn shorten(long_url: String, env: State<Env>, pool: State<Pool<RedisConnectionMa
 }
 
 #[get("/<short>")]
-fn longen(short: String, pool: State<Pool<RedisConnectionManager>>) -> Option<Redirect> {
+fn longen(short: String, pool: State<Pool<RedisConnectionManager>>, stats: Stats) -> Option<Redirect> {
     let connection = &pool.get().unwrap();
-    let long = long(short, connection);
+    let long = long(short, connection, stats);
     match long {
         Some(long) => {
             Some(Redirect::to(&long))
         }
         None => {
+            None
+        }
+    }
+}
+
+#[get("/<short>/stats")]
+fn stats(short: String, pool: State<Pool<RedisConnectionManager>>) -> Option<Content<String>> {
+    let connection = &pool.get().unwrap();
+    let stats = Stats::stats_as_json(short, connection);
+    match stats {
+        Ok(stats) => {
+            Some(Content(ContentType::JSON, stats.to_string()))
+        }
+        Err(_stats) => {
             None
         }
     }
@@ -80,12 +103,13 @@ fn bad_request(request: &Request) -> String {
 
 fn main() {
     let env = env_loader::init();
+    let geo_locate_ip = GeoLocateIP::new(env.mmdb_path.clone());
     let manager = RedisConnectionManager::new(env.redis_url.as_str()).unwrap();
     let pool = r2d2::Pool::builder()
         .build(manager)
         .unwrap();
     rocket::ignite()
-        .mount("/", routes![index, js, jquery, bootstrap_css, bootstrap_js, shorten, longen])
-        .catch(errors![not_found, bad_request]).manage(env).manage(pool)
+        .mount("/", routes![index, js, jquery, bootstrap_css, bootstrap_js, shorten, longen, stats])
+        .catch(errors![not_found, bad_request]).manage(env).manage(geo_locate_ip).manage(pool)
         .launch();
 }
