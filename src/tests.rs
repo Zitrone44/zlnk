@@ -1,6 +1,8 @@
 #![cfg(test)]
+use std::ops::Deref;
 use r2d2;
 use r2d2_redis::RedisConnectionManager;
+use redis;
 use env_loader;
 use shortener::{short, long};
 
@@ -12,6 +14,7 @@ fn shortener_test() {
         .build(manager)
         .unwrap();
     let connection = &pool.get().unwrap();
+    let _:() = redis::cmd("FLUSHDB").query(connection.deref()).unwrap();
     let long_url = "https://zlnk.de".to_string();
     let shorted = short(long_url.clone(), env, connection, None).unwrap();
     let longed = long(shorted, connection).unwrap();
@@ -26,6 +29,7 @@ fn invalid_url_test() {
         .build(manager)
         .unwrap();
     let connection = &pool.get().unwrap();
+    let _: () = redis::cmd("FLUSHDB").query(connection.deref()).unwrap();
     let long_url = "data:text/plain,https://zlnk.de".to_string();
     let shorted = short(long_url, env, connection, None).is_none();
     assert_eq!(shorted, true);
@@ -39,6 +43,7 @@ fn double_shortening_test() {
         .build(manager)
         .unwrap();
     let connection = &pool.get().unwrap();
+    let _: () = redis::cmd("FLUSHDB").query(connection.deref()).unwrap();
     let long_url = "https://zlnk.de".to_string();
     let shorted_one = short(long_url.clone(), env, connection, None).unwrap();
     let shorted_two = short(long_url.clone(), env, connection, None).unwrap();
