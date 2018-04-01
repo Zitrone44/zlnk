@@ -8,6 +8,7 @@ use woothee::parser::Parser;
 use env_loader::Env;
 use geo_locate_ip::GeoLocateIP;
 use serde_json::Value;
+use std::collections::HashMap;
 
 pub struct Stats {
     pub refer: String,
@@ -118,30 +119,27 @@ impl Stats {
         let _exists: String = connection.get(format!("short_{}", &short))?;
         let stats_key = &format!("stats_{}", short);
         let mut clicks: u64 = 0;
-        let mut refers: Vec<Value> = Vec::new();
-        let mut browsers: Vec<Value> = Vec::new();
-        let mut oss: Vec<Value> = Vec::new();
-        let mut countries: Vec<Value> = Vec::new();
+        let mut refers: HashMap<String, u64> = HashMap::new();
+        let mut browsers: HashMap<String, u64> = HashMap::new();
+        let mut oss: HashMap<String, u64> = HashMap::new();
+        let mut countries: HashMap<String, u64> = HashMap::new();
         let keys: Vec<String> = connection.hkeys(stats_key)?;
         for key in keys.iter() {
-            let value = connection.hget(stats_key, key)?;
+            let value :u64 = connection.hget(stats_key, key)?;
             if key == "clicks" {
                 clicks = value;
             } else {
-                let split: Vec<&str> = key.split('_').collect();
+                let split: Vec<_> = key.split('_').collect();
                 let typ = split[0];
-                let name = split[1];
-                let val = json!({
-                    name: value
-                });
+                let name = split[1].to_string();
                 if typ == "refer" {
-                    refers.push(val);
+                    refers.insert(name, value);
                 } else if typ == "browser" {
-                    browsers.push(val);
+                    browsers.insert(name, value);
                 } else if typ == "os" {
-                    oss.push(val);
+                    oss.insert(name, value);
                 } else if typ == "country" {
-                    countries.push(val);
+                    countries.insert(name, value);
                 } else {
                     panic!("Invalid typ: {}!", typ);
                 }
