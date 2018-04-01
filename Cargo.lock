@@ -673,7 +673,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "zlnk"
-version = "0.3.2"
+version = "0.3.3"
 dependencies = [
  "dotenv 0.11.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "r2d2 0.8.2 (registry+https://github.com/rust-lang/crates.io-index)",

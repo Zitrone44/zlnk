@@ -13,7 +13,7 @@ fn shortener_test() {
         .unwrap();
     let connection = &pool.get().unwrap();
     let long_url = "https://zlnk.de".to_string();
-    let shorted = short(long_url.clone(), env, connection).unwrap();
+    let shorted = short(long_url.clone(), env, connection, None).unwrap();
     let longed = long(shorted, connection).unwrap();
     assert_eq!(longed, long_url);
 }
@@ -27,7 +27,7 @@ fn invalid_url_test() {
         .unwrap();
     let connection = &pool.get().unwrap();
     let long_url = "data:text/plain,https://zlnk.de".to_string();
-    let shorted = short(long_url, env, connection).is_none();
+    let shorted = short(long_url, env, connection, None).is_none();
     assert_eq!(shorted, true);
 }
 
@@ -40,7 +40,7 @@ fn double_shortening_test() {
         .unwrap();
     let connection = &pool.get().unwrap();
     let long_url = "https://zlnk.de".to_string();
-    let shorted_one = short(long_url.clone(), env, connection).unwrap();
-    let shorted_two = short(long_url.clone(), env, connection).unwrap();
+    let shorted_one = short(long_url.clone(), env, connection, None).unwrap();
+    let shorted_two = short(long_url.clone(), env, connection, None).unwrap();
     assert_eq!(shorted_one, shorted_two);
 }

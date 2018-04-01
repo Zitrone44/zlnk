@@ -27,19 +27,33 @@ pub fn random(length: usize, alphabet_name: String) -> String {
     result.join("")
 }
 
-pub fn short(long_url: String, env: &Env, connection: &r2d2::PooledConnection<r2d2_redis::RedisConnectionManager>) -> Option<String> {
+pub fn short(long_url: String, env: &Env, connection: &r2d2::PooledConnection<r2d2_redis::RedisConnectionManager>, retries: Option<u8>) -> Option<String> {
     let valid = env.url_regex.is_match(&long_url);
     if valid {
-        let existing = connection.get(&long_url);
+        let existing = connection.get(format!("long_{}", &long_url));
         match existing {
             Ok(existing_short) => {
                 Some(existing_short)
             }
             Err(_err) => {
                 let random_value = random(env.short_length, env.short_alphabet.to_owned());
-                let _: () = connection.set(&random_value, &long_url).unwrap();
-                let _: () = connection.set(&long_url, &random_value).unwrap();
-                Some(random_value)
+                let exist = connection.get(format!("short_{}", &random_value));
+                match exist {
+                    Ok(_short) => {
+                        let _: String = _short;
+                        let retry = retries.unwrap_or(0);
+                        if retry == 10 {
+                            None
+                        } else {
+                            short(long_url, env, connection, Some(retry + 1))
+                        }
+                    }
+                    Err(_err) => {
+                        let _: () = connection.set(format!("short_{}", &random_value), &long_url).unwrap();
+                        let _: () = connection.set(format!("long_{}", &long_url), &random_value).unwrap();
+                        Some(random_value)
+                    }
+                }
             }
         }
     } else {
@@ -48,7 +62,7 @@ pub fn short(long_url: String, env: &Env, connection: &r2d2::PooledConnection<r2
 }
 
 pub fn long(short_url: String, connection: &r2d2::PooledConnection<r2d2_redis::RedisConnectionManager>) -> Option<String> {
-    let long = connection.get(short_url);
+    let long = connection.get(format!("short_{}", short_url));
     match long {
         Ok(long) => {
             Some(long)

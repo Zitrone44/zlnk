@@ -42,7 +42,7 @@ static_file!("/assets/bootstrap.min.js", "../assets/bootstrap.min.js", ContentTy
 #[post("/shorten", data="<long_url>")]
 fn shorten(long_url: String, env: State<Env>, pool: State<Pool<RedisConnectionManager>>) -> Result<String, Failure> {
     let connection = &pool.get().unwrap();
-    let short_url = short(long_url, env.inner(), connection);
+    let short_url = short(long_url, env.inner(), connection, None);
     match short_url {
         Some(short_url) => {
             Ok(short_url)
