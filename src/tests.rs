@@ -28,7 +28,7 @@ fn shortener_test() {
     let _:() = redis::cmd("FLUSHDB").query(connection.deref()).unwrap();
     let long_url = "https://zlnk.de".to_string();
     let shorted = short(long_url.clone(), env, connection, None).unwrap();
-    let longed = long(shorted, connection, stats).unwrap();
+    let longed = long(shorted, env, connection, stats).unwrap();
     assert_eq!(longed, long_url);
 }
 

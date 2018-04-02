@@ -10,7 +10,8 @@ pub struct Env {
     pub short_alphabet: String,
     pub bad_request_message: String,
     pub mmdb_path: String,
-    pub trust_proxy: bool
+    pub trust_proxy: bool,
+    pub disable_stats: bool
 }
 
 const URL_REGEX: &'static str = r"^(https?://)?([\da-z\.-]+)\.([a-z\.]{2,6})([/\w \.-]*)*/?$";
@@ -24,6 +25,7 @@ pub fn init() -> Env {
         short_alphabet: env::var("SHORT_ALPHABET").unwrap_or("hex".to_string()),
         bad_request_message: env::var("BAD_REQUEST_MESSAGE").unwrap_or("Ungültige URL".to_string()),
         mmdb_path: env::var("MMDB_PATH").unwrap_or("./GeoLite2-Country.mmdb".to_string()),
-        trust_proxy: env::var("TRUST_PROXY").is_ok()
+        trust_proxy: env::var("TRUST_PROXY").is_ok(),
+        disable_stats: env::var("DISABLE_STATS").is_ok()
     }
 }

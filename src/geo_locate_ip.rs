@@ -3,17 +3,29 @@ use std::net::IpAddr;
 use std::str::FromStr;
 
 pub struct GeoLocateIP {
-    reader: Reader
+    reader: Option<Reader>
 }
 
 impl GeoLocateIP {
-    pub fn new(path: String) -> Self {
-        let reader = Reader::open(&path).unwrap();
-        GeoLocateIP {reader: reader}
+    pub fn new(path: String, enabled: bool) -> Self {
+        if enabled {
+            let reader = Reader::open(&path).unwrap();
+            GeoLocateIP {reader: Some(reader)}
+        } else {
+            GeoLocateIP {reader: None}
+        }
     }
     pub fn locate(&self, ip_string: String) -> Option<String> {
         let ip: IpAddr = FromStr::from_str(&ip_string).unwrap();
-        let country = self.reader.lookup(ip);
+        let country;
+        match self.reader {
+            Some(ref reader) => {
+                country = reader.lookup(ip);
+            }
+            None => {
+                panic!("GEOReader not enabled!");
+            }
+        }
         match country {
             Ok(result) => {
                 let country: geoip2::Country = result;

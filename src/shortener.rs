@@ -62,11 +62,13 @@ pub fn short(long_url: String, env: &Env, connection: &r2d2::PooledConnection<r2
     }
 }
 
-pub fn long(short_url: String, connection: &r2d2::PooledConnection<r2d2_redis::RedisConnectionManager>, stats: Stats) -> Option<String> {
+pub fn long(short_url: String, env: &Env, connection: &r2d2::PooledConnection<r2d2_redis::RedisConnectionManager>, stats: Stats) -> Option<String> {
     let long = connection.get(format!("short_{}", &short_url));
     match long {
         Ok(long) => {
-            stats.save(short_url, connection).unwrap();
+            if !env.disable_stats {
+                stats.save(short_url, connection).unwrap();
+            }
             Some(long)
         }
         Err(_err) => {

@@ -43,6 +43,15 @@ impl<'a, 'r> FromRequest<'a, 'r> for Stats {
     type Error = ();
 
     fn from_request(request: &'a Request<'r>) -> request::Outcome<Stats, ()> {
+        let env = request.guard::<State<Env>>().unwrap();
+        if env.disable_stats {
+            return Outcome::Success(Stats {
+                refer: "Unknown".to_string(),
+                browser: "Unknown".to_string(),
+                os: "Unknown".to_string(),
+                country: "Unknown".to_string()
+            })
+        }
         let ip = request.guard::<IP>().unwrap();
         let geo_locate_ip = request.guard::<State<GeoLocateIP>>().unwrap();
         let refers: Vec<_> = request.headers().get("Referer").collect();

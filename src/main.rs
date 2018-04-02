@@ -63,9 +63,9 @@ fn shorten(long_url: String, env: State<Env>, pool: State<Pool<RedisConnectionMa
 }
 
 #[get("/<short>")]
-fn longen(short: String, pool: State<Pool<RedisConnectionManager>>, stats: Stats) -> Option<Redirect> {
+fn longen(short: String, env: State<Env>, pool: State<Pool<RedisConnectionManager>>, stats: Stats) -> Option<Redirect> {
     let connection = &pool.get().unwrap();
-    let long = long(short, connection, stats);
+    let long = long(short, env.inner(), connection, stats);
     match long {
         Some(long) => {
             Some(Redirect::to(&long))
@@ -77,7 +77,10 @@ fn longen(short: String, pool: State<Pool<RedisConnectionManager>>, stats: Stats
 }
 
 #[get("/<short>/stats")]
-fn stats(short: String, pool: State<Pool<RedisConnectionManager>>) -> Option<Content<String>> {
+fn stats(short: String, env: State<Env>, pool: State<Pool<RedisConnectionManager>>) -> Option<Content<String>> {
+    if env.disable_stats {
+        return None;
+    }
     let connection = &pool.get().unwrap();
     let stats = Stats::stats_as_json(short, connection);
     match stats {
@@ -103,7 +106,7 @@ fn bad_request(request: &Request) -> String {
 
 fn main() {
     let env = env_loader::init();
-    let geo_locate_ip = GeoLocateIP::new(env.mmdb_path.clone());
+    let geo_locate_ip = GeoLocateIP::new(env.mmdb_path.clone(), !env.disable_stats);
     let manager = RedisConnectionManager::new(env.redis_url.as_str()).unwrap();
     let pool = r2d2::Pool::builder()
         .build(manager)
