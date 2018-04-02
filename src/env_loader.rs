@@ -23,7 +23,7 @@ pub fn init() -> Env {
         url_regex: Regex::new(&env::var("URL_REGEX").unwrap_or(URL_REGEX.to_string())).unwrap(),
         short_length: usize::from_str(&env::var("SHORT_LENGTH").unwrap_or("5".to_string())).unwrap(),
         short_alphabet: env::var("SHORT_ALPHABET").unwrap_or("hex".to_string()),
-        bad_request_message: env::var("BAD_REQUEST_MESSAGE").unwrap_or("Ungültige URL".to_string()),
+        bad_request_message: env::var("BAD_REQUEST_MESSAGE").unwrap_or("Invalid URL".to_string()),
         mmdb_path: env::var("MMDB_PATH").unwrap_or("./GeoLite2-Country.mmdb".to_string()),
         trust_proxy: env::var("TRUST_PROXY").is_ok(),
         disable_stats: env::var("DISABLE_STATS").is_ok()
