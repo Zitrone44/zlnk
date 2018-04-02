@@ -2,6 +2,7 @@
 
 ## Installation
 ### Precompiled
+Precompiled binaries are available at the [releases](https://github.com/Zitrone44/zlnk/releases) page.
 
 ### From Source
 **Requirements:**
