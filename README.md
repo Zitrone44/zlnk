@@ -4,6 +4,16 @@
 ### Precompiled
 
 ### From Source
+**Requirements:**
+* git
+* rust (nightly)
+* cargo
+
+```
+git clone https://github.com/Zitrone44/zlnk.git
+cd zlnk
+cargo build --release
+```
 
 ## Configuration
 ### Enviroment Variables
