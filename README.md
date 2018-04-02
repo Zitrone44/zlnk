@@ -25,6 +25,6 @@ cargo build --release
 |SHORT_LENGTH|`5`|Any int (0 < i < 2^64)|Length of an short url|
 |SHORT_ALPHABET|`hex`|`hex`, `decimal`, `alpha`, `alpha-numeric`|Alphabet used in short urls|
 |BAD_REQUEST_MESSAGE|`Invalid URL`|Any String|Error message if submitted url does not matches the regex|
-|MMDB_PATH|`/GeoLite2-Country.mmdb`|Any Path to an mmdb file|Path to the mmdb file used for country detection|
+|MMDB_PATH|`./GeoLite2-Country.mmdb`|Any Path to an mmdb file|Path to the mmdb file used for country detection|
 |TRUST_PROXY|`false`|Set => `true`, Not Set => `false`|If set the `X-Forwarded-For` header value is used as request ip|
 |DISABLE_STATS|`false`|Set => `true`, Not Set => `false`|If set no stats are collected|
