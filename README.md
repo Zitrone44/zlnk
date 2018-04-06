@@ -1,4 +1,5 @@
 # ZLNK
+[![](https://img.shields.io/github/license/zitrone44/zlnk.svg?style=flat-square)](https://github.com/Zitrone44/zlnk/blob/master/LICENSE)
 
 ## Installation
 ### Precompiled
