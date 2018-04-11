@@ -21,7 +21,7 @@ cargo build --release
 ### Enviroment Variables
 |Name|Default|Possible Values|Description|
 |----|-------|---------------|-----------|
-|REDIS_URL|`redis://localhost`|Any redis URI (`redis://host:port/db`)|The URI of the redis instance zlnk should use|
+|REDIS_URL|`redis://localhost`|Any redis URI (`redis://host:port/db`)|The URL of the redis instance zlnk should use|
 |URL_REGEX|`^(https?://)?([\da-z\.-]+)\.([a-z\.]{2,6})([/\w \.-]*)*/?$`|Any rust RegEX|Only URLs that match this regex can be shortend|
 |SHORT_LENGTH|`5`|Any int (0 < i < 2^64)|Length of an short url|
 |SHORT_ALPHABET|`hex`|`hex`, `decimal`, `alpha`, `alpha-numeric`|Alphabet used in short urls|
