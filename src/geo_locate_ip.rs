@@ -9,7 +9,7 @@ pub struct GeoLocateIP {
 impl GeoLocateIP {
     pub fn new(path: String, enabled: bool) -> Self {
         if enabled {
-            let reader = Reader::open(&path).unwrap();
+            let reader = Reader::open(&path).expect(format!("Failed to Load \"{}\"!", &path).as_str());
             GeoLocateIP {reader: Some(reader)}
         } else {
             GeoLocateIP {reader: None}

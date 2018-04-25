@@ -110,7 +110,7 @@ fn main() {
     let manager = RedisConnectionManager::new(env.redis_url.as_str()).unwrap();
     let pool = r2d2::Pool::builder()
         .build(manager)
-        .unwrap();
+        .expect(format!("Failed to connect to \"{}\"!", env.redis_url.as_str()).as_str());
     rocket::ignite()
         .mount("/", routes![index, js, jquery, bootstrap_css, bootstrap_js, shorten, longen, stats])
         .catch(errors![not_found, bad_request]).manage(env).manage(geo_locate_ip).manage(pool)
