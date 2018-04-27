@@ -22,7 +22,7 @@ cargo build --release
 |Name|Default|Possible Values|Description|
 |----|-------|---------------|-----------|
 |REDIS_URL|`redis://localhost`|Any redis URI (`redis://host:port/db`)|The URL of the redis instance zlnk should use|
-|URL_REGEX|`^(https?://)?([\da-z\.-]+)\.([a-z\.]{2,6})([/\w \.-]*)*/?$`|Any rust RegEX|Only URLs that match this regex can be shortend|
+|URL_REGEX|`https?://(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)`|Any rust RegEX|Only URLs that match this regex can be shortend|
 |SHORT_LENGTH|`5`|Any int (0 < i < 2^64)|Length of an short url|
 |SHORT_ALPHABET|`hex`|`hex`, `decimal`, `alpha`, `alpha-numeric`|Alphabet used in short urls|
 |BAD_REQUEST_MESSAGE|`Invalid URL`|Any String|Error message if submitted url does not matches the regex|
